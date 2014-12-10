@@ -27,7 +27,7 @@ public class XMLToMongoTest
     public void transformDecimal()
     {
         BasicBSONObject result = transform("<number>123</number>");
-        assertThat(result).containsExactly(e("number", 123L));
+        assertThat(result).containsExactly(e("number", 123));
     }
     
     @Test
@@ -85,10 +85,10 @@ public class XMLToMongoTest
     {
         BasicBSONObject result = transform("<array><value><site><code>05</code></site><lieu><site><code>05</code></site><code>556</code></lieu></value>"
                                                 + "<value><site><code>05</code></site><lieu><site><code>05</code></site><code>561</code></lieu></value></array>");
-        assertThat(result).valueOf("array").asArray().containsExactly(lieu("05", 556L), lieu("05", 561L));
+        assertThat(result).valueOf("array").asArray().containsExactly(lieu("05", 556), lieu("05", 561));
     }
     
-    private static DBObject lieu(Object site, Object lieu)
+    private static DBObject lieu(Object site, int lieu)
     {
         return start().push("lieu").add("code", lieu).push("site").add("code", site).pop().pop().push("site").add("code", site).pop().get();
     }
@@ -105,7 +105,7 @@ public class XMLToMongoTest
     {
         return start("code", codeVal).push("valCle").pop().push("valDat").pop().push("valNum").pop().add("valTexte", valTexte).get();
     }
-    private static DBObject zv(String codeVal, long valNum)
+    private static DBObject zv(String codeVal, int valNum)
     {
         return start("code", codeVal).push("valCle").pop().push("valDat").pop().add("valNum", valNum).push("valTexte").pop().get();
     }
@@ -153,7 +153,7 @@ public class XMLToMongoTest
                                          + "<auditInfo.etat>ACTIF</auditInfo.etat>");
         Assertions.assertThat(result.keySet()).hasSize(13).containsExactly("array", "date", "decimal", "etat", "langue", "map", "null", "number", "refArray", "reference", "singleton", "string", "timestamp");
         assertThat(result).scalar("string").isEqualTo("NEGOCE");
-        assertThat(result).scalar("decimal").isEqualTo(123L);
+        assertThat(result).scalar("decimal").isEqualTo(123);
         assertThat(result).scalar("number").isEqualTo(123.2);
         assertThat(result).scalar("date").isEqualTo(new Date(114, 8, 26, 0, 0));
         assertThat(result).scalar("timestamp").isEqualTo(new Date(114, 11, 3, 15, 32));
@@ -161,7 +161,7 @@ public class XMLToMongoTest
         assertThat(result).valueOf("null").isEmpty();
         assertThat(result).valueOf("array").asArray().containsExactly("X", "A");
         assertThat(result).valueOf("singleton").asArray().containsExactly("X");
-        assertThat(result).valueOf("refArray").asArray().containsExactly(lieu("05", 556L), lieu("05", 561L));
+        assertThat(result).valueOf("refArray").asArray().containsExactly(lieu("05", 556), lieu("05", 561));
         assertThat(result).valueOf("map").containsExactly(e("001", zv("001", 5)), e("002", zv("001", "ABC")));
         assertThat(result).valueOf("langue").containsExactly(e("02", langue("A", "B", "C")), e("01", langue("X", "Y", "Z")));
         assertThat(result).scalar("etat").isEqualTo("ACTIF");

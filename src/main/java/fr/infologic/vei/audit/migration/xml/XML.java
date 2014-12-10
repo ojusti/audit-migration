@@ -314,7 +314,12 @@ public class XML {
             char initial = string.charAt(0);
             if (initial == '-' || (initial >= '0' && initial <= '9')) {
                 Long value = new Long(string);
-                if (value.toString().equals(string)) {
+                if (value.toString().equals(string)) 
+                {
+                    if (value <= Integer.MAX_VALUE && value >= Integer.MIN_VALUE)
+                    {
+                        return value.intValue();
+                    }
                     return value;
                 }
             }
