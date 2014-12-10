@@ -31,7 +31,17 @@
         <dependency>
             <groupId>fr.infologic.vei</groupId>
             <artifactId>audit-json</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
+            <version>11.2.0.3.0</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-dbutils</groupId>
+            <artifactId>commons-dbutils</artifactId>
+            <version>1.6</version>
         </dependency>
     </dependencies>
 </project>
