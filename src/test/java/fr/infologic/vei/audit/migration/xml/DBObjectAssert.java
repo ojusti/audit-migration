@@ -4,28 +4,27 @@ import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ListAssert;
 import org.assertj.core.api.MapAssert;
 import org.assertj.core.api.ObjectAssert;
-
-import com.mongodb.BasicDBList;
-import com.mongodb.DBObject;
+import org.bson.BSONObject;
+import org.bson.types.BasicBSONList;
 
 public class DBObjectAssert extends MapAssert<String, Object>
 {
-    private DBObject object;
+    private BSONObject object;
 
-    protected DBObjectAssert(DBObject actual)
+    protected DBObjectAssert(BSONObject actual)
     {
         super(actual.toMap());
         this.object = actual;
     }
 
-    public static DBObjectAssert assertThat(DBObject result)
+    public static DBObjectAssert assertThat(BSONObject result)
     {
         return new DBObjectAssert(result);
     }
 
     public DBObjectAssert valueOf(String key)
     {
-        return new DBObjectAssert((DBObject) object.get(key));
+        return new DBObjectAssert((BSONObject) object.get(key));
     }
     public ObjectAssert scalar(String key)
     {
@@ -34,7 +33,7 @@ public class DBObjectAssert extends MapAssert<String, Object>
 
     public ListAssert<Object> asArray()
     {
-        return Assertions.assertThat((BasicDBList) object);
+        return Assertions.assertThat((BasicBSONList) object);
     }
 
 }

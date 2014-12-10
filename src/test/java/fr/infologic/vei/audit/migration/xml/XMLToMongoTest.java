@@ -8,6 +8,7 @@ import java.util.Date;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.data.MapEntry;
+import org.bson.BasicBSONObject;
 import org.junit.Test;
 
 import com.mongodb.DBObject;
@@ -18,21 +19,21 @@ public class XMLToMongoTest
     @Test
     public void transformString()
     {
-        DBObject result = transform("<string>NEGOCE</string>");
+        BasicBSONObject result = transform("<string>NEGOCE</string>");
         assertThat(result).containsExactly(e("string", "NEGOCE"));
     }
     
     @Test
     public void transformDecimal()
     {
-        DBObject result = transform("<number>123</number>");
+        BasicBSONObject result = transform("<number>123</number>");
         assertThat(result).containsExactly(e("number", 123L));
     }
     
     @Test
     public void transformReal()
     {
-        DBObject result = transform("<number>123.2</number>");
+        BasicBSONObject result = transform("<number>123.2</number>");
         assertThat(result).containsExactly(e("number", 123.2));
     }
     
@@ -40,7 +41,7 @@ public class XMLToMongoTest
     @Test
     public void transformDate()
     {
-        DBObject result = transform("<date>26/09/14</date>");
+        BasicBSONObject result = transform("<date>26/09/14</date>");
         assertThat(result).containsExactly(e("date", new Date(114, 8, 26, 0, 0)));
     }
     
@@ -48,42 +49,42 @@ public class XMLToMongoTest
     @Test
     public void transformTimestamp()
     {
-        DBObject result = transform("<timestamp>03/12/14 15:32</timestamp>");
+        BasicBSONObject result = transform("<timestamp>03/12/14 15:32</timestamp>");
         assertThat(result).containsExactly(e("timestamp", new Date(114, 11, 3, 15, 32)));
     }
     
     @Test
     public void transformReference()
     {
-        DBObject result = transform("<reference><code>a code</code></reference>");
+        BasicBSONObject result = transform("<reference><code>a code</code></reference>");
         assertThat(result).valueOf("reference").containsExactly(e("code", "a code"));
     }
     
     @Test
     public void transformNull()
     {
-        DBObject result = transform("<null/>");
+        BasicBSONObject result = transform("<null/>");
         assertThat(result).valueOf("null").isEmpty();
     }
 
     @Test
     public void transformArray()
     {
-        DBObject result = transform("<array><value>X</value><value>A</value></array>");
+        BasicBSONObject result = transform("<array><value>X</value><value>A</value></array>");
         assertThat(result).valueOf("array").asArray().containsExactly("X","A");
     }
     @Test
     public void transformSingletonArray()
     {
-        DBObject result = transform("<array><value>X</value></array>");
+        BasicBSONObject result = transform("<array><value>X</value></array>");
         assertThat(result).valueOf("array").asArray().containsExactly("X");
     }
     
     @Test
     public void transformArrayOfObjects()
     {
-        DBObject result = transform("<array><value><site><code>05</code></site><lieu><site><code>05</code></site><code>556</code></lieu></value>"
-                                         + "<value><site><code>05</code></site><lieu><site><code>05</code></site><code>561</code></lieu></value></array>");
+        BasicBSONObject result = transform("<array><value><site><code>05</code></site><lieu><site><code>05</code></site><code>556</code></lieu></value>"
+                                                + "<value><site><code>05</code></site><lieu><site><code>05</code></site><code>561</code></lieu></value></array>");
         assertThat(result).valueOf("array").asArray().containsExactly(lieu("05", 556L), lieu("05", 561L));
     }
     
@@ -95,8 +96,8 @@ public class XMLToMongoTest
     @Test
     public void transformMapOfZV()
     {
-        DBObject result = transform("<map><entry><key><code>001</code></key><value><famZv><code>001</code></famZv><famZvVal><famZv><code>001</code></famZv><code>001</code></famZvVal><valNum>5</valNum><valCle/><valDat/><valTexte/></value></entry>"
-                                       + "<entry><key><code>002</code></key><value><famZv><code>002</code></famZv><famZvVal><famZv><code>002</code></famZv><code>001</code></famZvVal><valNum/><valCle/><valDat/><valTexte>ABC</valTexte></value></entry></map>");
+        BasicBSONObject result = transform("<map><entry><key><code>001</code></key><value><famZv><code>001</code></famZv><famZvVal><famZv><code>001</code></famZv><code>001</code></famZvVal><valNum>5</valNum><valCle/><valDat/><valTexte/></value></entry>"
+                                              + "<entry><key><code>002</code></key><value><famZv><code>002</code></famZv><famZvVal><famZv><code>002</code></famZv><code>001</code></famZvVal><valNum/><valCle/><valDat/><valTexte>ABC</valTexte></value></entry></map>");
         assertThat(result).valueOf("map").containsExactly(e("001", zv("001", 5)), e("002", zv("001", "ABC")));
     }
     
@@ -112,8 +113,8 @@ public class XMLToMongoTest
     @Test
     public void transformMapOfLangues()
     {
-        DBObject result = transform("<langue><entry><key><code>02</code></key><value><langue><code>02</code></langue><libStd>A</libStd><libCourt>B</libCourt><libAbrege>C</libAbrege></value></entry>"
-                                          + "<entry><key><code>01</code></key><value><langue><code>01</code></langue><libStd>X</libStd><libCourt>Y</libCourt><libAbrege>Z</libAbrege></value></entry></langue>");
+        BasicBSONObject result = transform("<langue><entry><key><code>02</code></key><value><langue><code>02</code></langue><libStd>A</libStd><libCourt>B</libCourt><libAbrege>C</libAbrege></value></entry>"
+                                                 + "<entry><key><code>01</code></key><value><langue><code>01</code></langue><libStd>X</libStd><libCourt>Y</libCourt><libAbrege>Z</libAbrege></value></entry></langue>");
         assertThat(result).valueOf("langue").containsExactly(e("02", langue("A", "B", "C")), e("01", langue("X", "Y", "Z")));
     }
     
@@ -125,7 +126,7 @@ public class XMLToMongoTest
     @Test
     public void transformAuditInfoEtat()
     {
-        DBObject result = transform("<auditInfo.etat>ACTIF</auditInfo.etat>");
+        BasicBSONObject result = transform("<auditInfo.etat>ACTIF</auditInfo.etat>");
         assertThat(result).containsExactly(e("etat", "ACTIF"));
     }
     
@@ -134,22 +135,22 @@ public class XMLToMongoTest
     @Test
     public void transformAll()
     {
-        DBObject result = transform("<string>NEGOCE</string>"
-                                  + "<decimal>123</decimal>"
-                                  + "<number>123.2</number>"
-                                  + "<date>26/09/14</date>"
-                                  + "<timestamp>03/12/14 15:32</timestamp>"
-                                  + "<reference><code>a code</code></reference>"
-                                  + "<null/>"
-                                  + "<array><value>X</value><value>A</value></array>"
-                                  + "<singleton><value>X</value></singleton>"
-                                  + "<refArray><value><site><code>05</code></site><lieu><site><code>05</code></site><code>556</code></lieu></value>"
-                                            + "<value><site><code>05</code></site><lieu><site><code>05</code></site><code>561</code></lieu></value></refArray>"
-                                  + "<map><entry><key><code>001</code></key><value><famZv><code>001</code></famZv><famZvVal><famZv><code>001</code></famZv><code>001</code></famZvVal><valNum>5</valNum><valCle/><valDat/><valTexte/></value></entry>"
-                                       + "<entry><key><code>002</code></key><value><famZv><code>002</code></famZv><famZvVal><famZv><code>002</code></famZv><code>001</code></famZvVal><valNum/><valCle/><valDat/><valTexte>ABC</valTexte></value></entry></map>"
-                                  + "<langue><entry><key><code>02</code></key><value><langue><code>02</code></langue><libStd>A</libStd><libCourt>B</libCourt><libAbrege>C</libAbrege></value></entry>"
-                                          + "<entry><key><code>01</code></key><value><langue><code>01</code></langue><libStd>X</libStd><libCourt>Y</libCourt><libAbrege>Z</libAbrege></value></entry></langue>"
-                                  + "<auditInfo.etat>ACTIF</auditInfo.etat>");
+        BasicBSONObject result = transform("<string>NEGOCE</string>"
+                                         + "<decimal>123</decimal>"
+                                         + "<number>123.2</number>"
+                                         + "<date>26/09/14</date>"
+                                         + "<timestamp>03/12/14 15:32</timestamp>"
+                                         + "<reference><code>a code</code></reference>"
+                                         + "<null/>"
+                                         + "<array><value>X</value><value>A</value></array>"
+                                         + "<singleton><value>X</value></singleton>"
+                                         + "<refArray><value><site><code>05</code></site><lieu><site><code>05</code></site><code>556</code></lieu></value>"
+                                                   + "<value><site><code>05</code></site><lieu><site><code>05</code></site><code>561</code></lieu></value></refArray>"
+                                         + "<map><entry><key><code>001</code></key><value><famZv><code>001</code></famZv><famZvVal><famZv><code>001</code></famZv><code>001</code></famZvVal><valNum>5</valNum><valCle/><valDat/><valTexte/></value></entry>"
+                                              + "<entry><key><code>002</code></key><value><famZv><code>002</code></famZv><famZvVal><famZv><code>002</code></famZv><code>001</code></famZvVal><valNum/><valCle/><valDat/><valTexte>ABC</valTexte></value></entry></map>"
+                                         + "<langue><entry><key><code>02</code></key><value><langue><code>02</code></langue><libStd>A</libStd><libCourt>B</libCourt><libAbrege>C</libAbrege></value></entry>"
+                                                 + "<entry><key><code>01</code></key><value><langue><code>01</code></langue><libStd>X</libStd><libCourt>Y</libCourt><libAbrege>Z</libAbrege></value></entry></langue>"
+                                         + "<auditInfo.etat>ACTIF</auditInfo.etat>");
         Assertions.assertThat(result.keySet()).hasSize(13).containsExactly("array", "date", "decimal", "etat", "langue", "map", "null", "number", "refArray", "reference", "singleton", "string", "timestamp");
         assertThat(result).scalar("string").isEqualTo("NEGOCE");
         assertThat(result).scalar("decimal").isEqualTo(123L);
@@ -166,11 +167,9 @@ public class XMLToMongoTest
         assertThat(result).scalar("etat").isEqualTo("ACTIF");
     }
     
-    private static DBObject transform(String content)
+    private static BasicBSONObject transform(String content)
     {
-        DBObject result = XMLToMongo.transform(document(content));
-        System.out.println(result);
-        return result;
+        return XMLToMongo.transform(document(content));
     }
     private static String document(String content) 
     {

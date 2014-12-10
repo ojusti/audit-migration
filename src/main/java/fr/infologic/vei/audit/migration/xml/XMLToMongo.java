@@ -4,14 +4,16 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.mongodb.BasicDBList;
+import org.bson.BSONObject;
+import org.bson.BasicBSONObject;
+import org.bson.types.BasicBSONList;
+
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
-import com.mongodb.DBObject;
 
 public class XMLToMongo
 {
-    public static DBObject transform(String document)
+    public static BasicBSONObject transform(String document)
     {
         Map<String, Object> map = xmlToMaps(document);
         removeClass(map);
@@ -38,9 +40,9 @@ public class XMLToMongo
         }
     }
 
-    private static DBObject mapsToMongo(Map<String, Object> map)
+    private static BasicBSONObject mapsToMongo(Map<String, Object> map)
     {
-        BasicDBObject result = new BasicDBObject(map);
+        BasicBSONObject result = new BasicBSONObject(map);
         for(Map.Entry<String, Object> entry : result.entrySet())
         {
             if(isObject(entry.getValue()))
@@ -51,7 +53,7 @@ public class XMLToMongo
         return result;
     }
 
-    private static DBObject objectToMongo(Map.Entry<String, Object> object)
+    private static BSONObject objectToMongo(Map.Entry<String, Object> object)
     {
         Map<String, Object> content = ((JSONObject) object.getValue()).map;
         if(content.size() == 1)
@@ -69,9 +71,9 @@ public class XMLToMongo
         return mapsToMongo(content);
     }
     
-    private static BasicDBList arrayToMongo(Object content)
+    private static BasicBSONList arrayToMongo(Object content)
     {
-        BasicDBList result = new BasicDBList();
+        BasicBSONList result = new BasicBSONList();
         for(Object value : asList(content))
         {
             result.add(isObject(value) ? mapsToMongo(((JSONObject) value).map) : value);
@@ -79,7 +81,7 @@ public class XMLToMongo
         return result;
     }
 
-    private static DBObject mapToMongo(String key, Object value)
+    private static BSONObject mapToMongo(String key, Object value)
     {
         if(isLangue(key))
         {
@@ -88,7 +90,7 @@ public class XMLToMongo
         return mapZVToMongo(value);
     }
     
-    private static DBObject mapLanguesToMongo(Object value)
+    private static BSONObject mapLanguesToMongo(Object value)
     {
         BasicDBObjectBuilder map = BasicDBObjectBuilder.start();
         for(JSONObject entry : (List<JSONObject>) asList(value))
@@ -108,7 +110,7 @@ public class XMLToMongo
     }
 
     private static final String[] valuesZV = {"valCle", "valDat", "valNum", "valTexte"};
-    private static DBObject mapZVToMongo(Object value)
+    private static BSONObject mapZVToMongo(Object value)
     {
         BasicDBObjectBuilder map = BasicDBObjectBuilder.start();
         for(JSONObject entry : (List<JSONObject>) asList(value))
