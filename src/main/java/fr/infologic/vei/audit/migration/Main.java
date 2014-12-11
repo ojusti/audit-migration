@@ -1,9 +1,8 @@
 package fr.infologic.vei.audit.migration;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
-import java.nio.file.Files;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.sql.SQLException;
 import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -43,16 +42,34 @@ public class Main
         int recordsInMongo = mongo.count();
         if(recordsInMongo != recordsInOracle)
         {
-            throw new RuntimeException(String.format("Number of documents in Mongo is %d but should be %d", recordsInMongo, recordsInOracle));
+            System.err.println(String.format("Number of documents in Mongo is %d but should be %d", recordsInMongo, recordsInOracle));
+            System.exit(1);
         }
     }
     
     private static void parseArgs(String[] args)
     {
-        numberOfThreads = Integer.parseInt(args[0]);
-        oracleDBURL = args[1];
-        dBUser = args[2];
-        oracleDBPassword = args.length == 3 ? args[2] : args[3];
+        try
+        {
+            numberOfThreads = Integer.parseInt(args[0]);
+            oracleDBURL = args[1];
+            dBUser = args[2];
+            oracleDBPassword = args.length == 3 ? args[2] : args[3];
+            System.out.println(String.format("number of threads = %d", numberOfThreads));
+            System.out.println(String.format("Oracle DB URL = %s", oracleDBURL));
+            System.out.println(String.format("Oracle DB user = %d", dBUser));
+            System.out.println(String.format("Oracle DB password = %d", oracleDBPassword));
+            System.out.println(String.format("Mongo DB user on localhost default Mongo port = %d", dBUser));
+        }
+        catch(Throwable e)
+        {
+            System.err.println("Arguments:");
+            System.err.println("1. number of threads: integer. Example : 8");
+            System.err.println("2. Oracle DB URL: string. Example : jdbc:oracle:thin:@10.99.81.6:1521:orcl");
+            System.err.println("3. Oracle DB user and Mongo DB user (on default Mongo port on localhost): string. Example : VENTES");
+            System.err.println("4. Oracle DB password: optional string. Example : VENTES. If missing, it defaults to DB user");
+            System.exit(1);
+        }
     }
     
     @SuppressWarnings("deprecation")
@@ -68,8 +85,10 @@ public class Main
     
     static Set<String> withoutDossier() throws IOException
     {
-        URL communList = Main.class.getResource("/commun.lst");
-        return Files.lines(new File(communList.getFile()).toPath()).collect(Collectors.toSet());
+        try(LineNumberReader reader = new LineNumberReader(new InputStreamReader(Main.class.getResourceAsStream("/commun.lst"))))
+        {
+            return reader.lines().collect(Collectors.toSet());
+        }
     }
 
     private static AuditMongoDataSink mongo()
