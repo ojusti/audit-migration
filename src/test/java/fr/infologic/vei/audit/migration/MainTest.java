@@ -1,6 +1,8 @@
 package fr.infologic.vei.audit.migration;
 
+import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Collections;
 
 import oracle.jdbc.pool.OracleDataSource;
 
@@ -17,7 +19,7 @@ public class MainTest extends AuditGatewayStub
     private static final String PASSWORD = "RAN_VT_VALENTIN";
     
     @Test
-    public void ingestAll() throws SQLException, InterruptedException
+    public void ingestAll() throws SQLException, InterruptedException, IOException
     {
         Main.main("8", URL, USER, PASSWORD);
     }
@@ -33,7 +35,7 @@ public class MainTest extends AuditGatewayStub
         key.setMetadataId("fr.infologic.gpao.modele.Planning");
         key.setSourceDosResIK(2L);
         key.setSourceEK("SEM");
-        new AuditMongoDataSink(this).ingest(new AuditOracleDataSource(db).fetch(key));
+        new AuditMongoDataSink(this).ingest(new AuditOracleDataSource(db, Collections.emptySet()).fetch(key));
     }
 
     @Override

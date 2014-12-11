@@ -1,7 +1,5 @@
 package fr.infologic.vei.audit.migration;
 
-import static org.junit.Assert.fail;
-
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,11 +10,7 @@ import org.assertj.core.api.Condition;
 import org.junit.Before;
 import org.junit.Test;
 
-import fr.infologic.vei.audit.api.AdminDB;
 import fr.infologic.vei.audit.api.AuditIngestTrace;
-import fr.infologic.vei.audit.api.AuditTrace;
-import fr.infologic.vei.audit.api.TrailKey;
-import fr.infologic.vei.audit.gateway.AuditGateway;
 import fr.infologic.vei.audit.mongo.json.MongoJson;
 
 

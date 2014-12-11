@@ -1,10 +1,16 @@
 package fr.infologic.vei.audit.migration;
 
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.nio.file.Files;
 import java.sql.SQLException;
+import java.util.Set;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor.CallerRunsPolicy;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import oracle.jdbc.pool.OracleDataSource;
 
@@ -19,7 +25,7 @@ public class Main
     private static AuditMongoDataSink mongo;
     private static ThreadPoolExecutor executor;
 
-    public static void main(String... args) throws SQLException, InterruptedException
+    public static void main(String... args) throws SQLException, InterruptedException, IOException
     {
         parseArgs(args);
         oracleDataSource().forEachKey(migrateToMongo());
@@ -50,16 +56,22 @@ public class Main
     }
     
     @SuppressWarnings("deprecation")
-    private static AuditOracleDataSource oracleDataSource() throws SQLException
+    private static AuditOracleDataSource oracleDataSource() throws SQLException, IOException
     {
         OracleDataSource db = new OracleDataSource();
         db.setURL(oracleDBURL);
         db.setUser(dBUser);
         db.setPassword(oracleDBPassword);
         db.setConnectionCachingEnabled(true);
-        return oracle = new AuditOracleDataSource(db);
+        return oracle = new AuditOracleDataSource(db, withoutDossier());
     }
     
+    static Set<String> withoutDossier() throws IOException
+    {
+        URL communList = Main.class.getResource("/commun.lst");
+        return Files.lines(new File(communList.getFile()).toPath()).collect(Collectors.toSet());
+    }
+
     private static AuditMongoDataSink mongo()
     {
         return mongo = new AuditMongoDataSink(dBUser);

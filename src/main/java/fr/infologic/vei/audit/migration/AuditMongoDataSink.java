@@ -97,6 +97,7 @@ class AuditMongoDataSink implements AuditDataSink
         trace.metadata.put("LABEL", entry.typ);
         trace.metadata.put("TIMESTAMP", entry.datCre);
         trace.metadata.put("UTILISATEUR", entry.codeUtil);
+        trace.metadata.put("DOSSIER_CONNEXION", entry.dossier);
         return trace;
     }
 

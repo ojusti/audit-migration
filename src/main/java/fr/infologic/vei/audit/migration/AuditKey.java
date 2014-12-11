@@ -7,6 +7,7 @@ public class AuditKey implements TrailKey
     String metadataId;
     Long dossier;
     String ek;
+    private boolean hasDossier = true;
     
     public void setMetadataId(String metadataId) 
     {
@@ -31,7 +32,7 @@ public class AuditKey implements TrailKey
     @Override
     public String getGroup()
     {
-        return dossier == null ? null : dossier.toString();
+        return !hasDossier || dossier == null ? null : dossier.toString();
     }
 
     @Override
@@ -44,6 +45,17 @@ public class AuditKey implements TrailKey
     {
         return String.format("AuditKey [metadataId=%s, sourceDosResIK=%s, sourceEK=%s]",
                          getType(), getGroup(), getKey());
+    }
+
+    boolean hasDossier()
+    {
+        return hasDossier;
+    }
+
+    AuditKey withoutDossier()
+    {
+        hasDossier = false;
+        return this;
     }
     
 }
