@@ -8,4 +8,9 @@ public class MigrationAuditException extends RuntimeException
         super(e);
     }
 
+    public MigrationAuditException(AuditKey key, Throwable t)
+    {
+        super(key.toString(), t);
+    }
+
 }

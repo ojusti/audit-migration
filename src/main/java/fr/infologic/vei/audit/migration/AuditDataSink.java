@@ -4,6 +4,7 @@ import java.util.List;
 
 interface AuditDataSink
 {
+    int count();
     int count(AuditKey key);
     void delete(AuditKey key);
     void ingest(List<AuditContent> content);

@@ -16,11 +16,29 @@ public class Main
     private static String dBUser;
     private static String oracleDBPassword;
     private static AuditOracleDataSource oracle;
+    private static AuditMongoDataSink mongo;
+    private static ThreadPoolExecutor executor;
 
-    public static void main(String[] args) throws SQLException
+    public static void main(String... args) throws SQLException, InterruptedException
     {
         parseArgs(args);
         oracleDataSource().forEachKey(migrateToMongo());
+        checkNumberOfDocuments();
+        
+    }
+
+    private static void checkNumberOfDocuments() throws InterruptedException
+    {
+        executor.shutdown();
+        executor.awaitTermination(1, TimeUnit.HOURS);
+        System.out.println(oracle.mesure);
+        System.out.println(mongo.mesure);
+        int recordsInOracle = oracle.count();
+        int recordsInMongo = mongo.count();
+        if(recordsInMongo != recordsInOracle)
+        {
+            throw new RuntimeException(String.format("Number of documents in Mongo is %d but should be %d", recordsInMongo, recordsInOracle));
+        }
     }
     
     private static void parseArgs(String[] args)
@@ -31,27 +49,36 @@ public class Main
         oracleDBPassword = args.length == 3 ? args[2] : args[3];
     }
     
+    @SuppressWarnings("deprecation")
     private static AuditOracleDataSource oracleDataSource() throws SQLException
     {
         OracleDataSource db = new OracleDataSource();
         db.setURL(oracleDBURL);
         db.setUser(dBUser);
         db.setPassword(oracleDBPassword);
+        db.setConnectionCachingEnabled(true);
         return oracle = new AuditOracleDataSource(db);
     }
     
     private static AuditMongoDataSink mongo()
     {
-        return new AuditMongoDataSink(dBUser);
+        return mongo = new AuditMongoDataSink(dBUser);
     }
     
     private static ThreadPoolExecutor executor()
     {
-        return new ThreadPoolExecutor(numberOfThreads, numberOfThreads, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<>(500), new CallerRunsPolicy());
+        return executor = new ThreadPoolExecutor(numberOfThreads, numberOfThreads, 0, TimeUnit.SECONDS, new LinkedBlockingQueue<>(500), new CallerRunsPolicy());
     }
     
     private static Migration migrateToMongo()
     {
-        return new Migration(oracle, executor(), mongo());
+        System.out.println(String.format("Number of documents in Oracle : %d", oracle.count()));
+        int documentsInMongo = mongo().count();
+        System.out.println(String.format("Number of documents in Mongo : %d", documentsInMongo));
+        if(documentsInMongo == 0)
+        {
+            mongo.setIsEmpty();
+        }
+        return new Migration(oracle, executor(), mongo);
     }
 }

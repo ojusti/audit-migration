@@ -2,7 +2,7 @@ package fr.infologic.vei.audit.migration;
 
 import fr.infologic.vei.audit.api.TrailKey;
 
-class AuditKey implements TrailKey
+public class AuditKey implements TrailKey
 {
     String metadataId;
     Long dossier;
@@ -39,6 +39,11 @@ class AuditKey implements TrailKey
     {
         return ek;
     }
-    
+    @Override
+    public String toString()
+    {
+        return String.format("AuditKey [metadataId=%s, sourceDosResIK=%s, sourceEK=%s]",
+                         getType(), getGroup(), getKey());
+    }
     
 }

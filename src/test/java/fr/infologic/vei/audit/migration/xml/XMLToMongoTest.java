@@ -101,13 +101,26 @@ public class XMLToMongoTest
         assertThat(result).valueOf("map").containsExactly(e("001", zv("001", 5)), e("002", zv("001", "ABC")));
     }
     
+    @Test
+    public void transformMapOfZVNum()
+    {
+        BasicBSONObject result = transform("<map><entry><key><code>001</code></key><value><famZv><code>001</code></famZv><famZvVal/><valNum>5</valNum><valCle/><valDat/><valTexte/></value></entry></map>");
+        assertThat(result).valueOf("map").containsExactly(e("001", zv(null, 5)));
+    }
+    @Test
+    public void transformMapOfZV_withoutFamZvVal()
+    {
+        BasicBSONObject result = transform("<map><entry><key><code>001</code></key><value><famZv><code>001</code></famZv><valNum>5</valNum><valCle/><valDat/><valTexte/></value></entry></map>");
+        assertThat(result).valueOf("map").containsExactly(e("001", zv(null, 5)));
+    }
+    
     private static DBObject zv(String codeVal, String valTexte)
     {
-        return start("code", codeVal).push("valCle").pop().push("valDat").pop().push("valNum").pop().add("valTexte", valTexte).get();
+        return start("famZvVal", codeVal).push("valCle").pop().push("valDat").pop().push("valNum").pop().add("valTexte", valTexte).get();
     }
     private static DBObject zv(String codeVal, int valNum)
     {
-        return start("code", codeVal).push("valCle").pop().push("valDat").pop().add("valNum", valNum).push("valTexte").pop().get();
+        return (codeVal == null ? start().push("famZvVal").pop() : start("famZvVal", codeVal)).push("valCle").pop().push("valDat").pop().add("valNum", valNum).push("valTexte").pop().get();
     }
     
     @Test
@@ -167,7 +180,7 @@ public class XMLToMongoTest
         assertThat(result).scalar("etat").isEqualTo("ACTIF");
     }
     
-    private static BasicBSONObject transform(String content)
+    static BasicBSONObject transform(String content)
     {
         return XMLToMongo.transform(document(content));
     }

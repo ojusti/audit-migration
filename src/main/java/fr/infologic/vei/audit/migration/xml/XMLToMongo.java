@@ -95,7 +95,7 @@ public class XMLToMongo
         BasicDBObjectBuilder map = BasicDBObjectBuilder.start();
         for(JSONObject entry : (List<JSONObject>) asList(value))
         {
-            map.push(entry.getJSONObject("key").getString("code"));
+            map.push(String.valueOf(entry.getJSONObject("key").get("code")));
             JSONObject object = entry.getJSONObject("value");
             for(String key : object.keySet())
             {
@@ -115,9 +115,9 @@ public class XMLToMongo
         BasicDBObjectBuilder map = BasicDBObjectBuilder.start();
         for(JSONObject entry : (List<JSONObject>) asList(value))
         {
-            map.push(entry.getJSONObject("key").getString("code"));
+            map.push(String.valueOf(entry.getJSONObject("key").get("code")));
             JSONObject object = entry.getJSONObject("value");
-            map.add("code", object.getJSONObject("famZvVal").getString("code"));
+            map.add("famZvVal", getCodeFamZvVal(object));
             for(String val : valuesZV)
             {
                 map.add(val, scalarOrEmpty(object.get(val)));
@@ -127,9 +127,15 @@ public class XMLToMongo
         return map.get();
     }
 
+    private static Object getCodeFamZvVal(JSONObject object)
+    {
+        JSONObject famZvVal = object.optJSONObject("famZvVal");
+        return scalarOrEmpty(famZvVal == null ? null : famZvVal.opt("code"));
+    }
+
     private static Object scalarOrEmpty(Object object)
     {
-        return isObject(object) ? new BasicDBObject() : object;
+        return object == null || isObject(object) ? new BasicDBObject() : object;
     }
     
     private static List<?> asList(Object value)

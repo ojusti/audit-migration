@@ -1,5 +1,7 @@
 package fr.infologic.vei.audit.migration;
 
+import static fr.infologic.vei.audit.migration.Mesure.IS_10000;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +17,7 @@ class AuditMongoDataSink implements AuditDataSink
 {
 
     private final AuditGateway gateway;
+    private boolean empty;
 
     AuditMongoDataSink(String dbName)
     {
@@ -32,10 +35,20 @@ class AuditMongoDataSink implements AuditDataSink
         this.gateway = gateway;
     }
 
+    void setIsEmpty()
+    {
+        this.empty = true;
+    }
+    @Override
+    public int count()
+    {
+        return gateway.db().count();
+    }
+    
     @Override
     public int count(AuditKey key)
     {
-        return gateway.find(key).count();
+        return empty ? 0 : gateway.find(key).count();
     }
 
     @Override
@@ -47,19 +60,29 @@ class AuditMongoDataSink implements AuditDataSink
     @Override
     public void ingest(List<AuditContent> trail)
     {
-        Collections.sort(trail);
-        MongoJson base = new MongoJson(null);
-        for(int version = trail.size(); version > 0; version--)
+        mesure.arm();
+        try
         {
-            AuditContent trace = trail.get(version - 1);
-            AuditIngestTrace patch = makeTrace(trace);
-            patch.version = version;
-            MongoJson content = new MongoJson(XMLToMongo.transform(trace.xml));
-            patch.content = content.diff(base);
-            gateway.ingest(patch);
-            base = content;
+            Collections.sort(trail);
+            MongoJson base = new MongoJson(null);
+            for(int version = trail.size(); version > 0; version--)
+            {
+                AuditContent trace = trail.get(version - 1);
+                AuditIngestTrace patch = makeTrace(trace);
+                patch.version = version;
+                MongoJson content = new MongoJson(XMLToMongo.transform(trace.xml()));
+                patch.content = content.diff(base);
+                gateway.ingest(patch);
+                base = content;
+            }
+        }
+        finally
+        {
+            mesure.count(1, trail.size());
+            mesure.printIf(IS_10000);
         }
     }
+    Mesure mesure = new Mesure("Mongo ingest", "keys", "docs");
     static AuditIngestTrace makeTrace(AuditContent entry)
     {
         AuditIngestTrace trace = new AuditIngestTrace();

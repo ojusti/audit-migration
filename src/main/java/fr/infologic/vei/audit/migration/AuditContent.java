@@ -1,5 +1,6 @@
 package fr.infologic.vei.audit.migration;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.sql.Blob;
@@ -15,14 +16,14 @@ public class AuditContent extends AuditKey implements Comparable<AuditContent>
     String codeUtil;
     String ip;
     String guid;
-    String xml = "<object/>";
     String typ = "CREATION";
+    private byte[] xMLZip;
 
     @Override
     public String toString()
     {
-        return String.format("AuditContent [metadataId=%, sourceIK=%s, dat=%s, sourceDosResIK=%s, sourceEK=%s, codeUtil=%s, ip=%s, guid=%s, typ=%s, xMLZip=%s]",
-                             metadataId, sourceIK, dat, dossier, ek, codeUtil, ip, guid, typ, xml);
+        return String.format("AuditContent [metadataId=%s, sourceIK=%d, dat=%s, sourceDosResIK=%d, sourceEK=%s, codeUtil=%s, ip=%s, guid=%s, typ=%s, xml=%s]",
+                             metadataId, sourceIK, dat, dossier, ek, codeUtil, ip, guid, typ, xml());
     }
     public void setSourceIK(Long sourceIK)
     {
@@ -58,12 +59,28 @@ public class AuditContent extends AuditKey implements Comparable<AuditContent>
         {
             return;
         }
-        try(GZIPInputStream gzip = new GZIPInputStream(xMLZip.getBinaryStream(), 16384);
+        try
+        {
+            this.xMLZip = xMLZip.getBytes(1, (int) xMLZip.length());
+        }
+        catch (SQLException e)
+        {
+            throw new MigrationAuditException(e);
+        }
+    }
+    
+    String xml()
+    {
+        if(xMLZip == null)
+        {
+            return "<object/>";
+        }
+        try(GZIPInputStream gzip = new GZIPInputStream(new ByteArrayInputStream(xMLZip));
             ObjectInputStream reader = new ObjectInputStream(gzip))
         {
-            this.xml = (String) reader.readObject();
+            return (String) reader.readObject();
         }
-        catch (IOException | SQLException | ClassNotFoundException e)
+        catch (IOException | ClassNotFoundException e)
         {
             throw new MigrationAuditException(e);
         }

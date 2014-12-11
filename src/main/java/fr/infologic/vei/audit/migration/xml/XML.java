@@ -270,8 +270,8 @@ public class XML {
                                     context.accumulate(tagName, "");
                                 } else if (jsonobject.length() == 1 &&
                                        jsonobject.opt("content") != null) {
-                                    context.accumulate(tagName,
-                                            jsonobject.opt("content"));
+                                    Object value = jsonobject.opt("content");
+                                    context.accumulate(tagName, colate(value));
                                 } else {
                                     context.accumulate(tagName, jsonobject);
                                 }
@@ -283,6 +283,23 @@ public class XML {
                     throw x.syntaxError("Misshaped tag");
                 }
             }
+        }
+    }
+
+    private static Object colate(Object value)
+    {
+        StringBuffer stringValue = new StringBuffer();
+        if (value instanceof JSONArray) 
+        {
+            JSONArray ja = (JSONArray)value;
+            int length = ja.length();
+            for (int i = 0; i < length; i += 1) 
+            {
+                stringValue.append(ja.get(i).toString());
+            }
+            return stringValue.toString();
+        } else {
+            return value;
         }
     }
 
@@ -298,13 +315,13 @@ public class XML {
      */
     public static Object stringToValue(String string) {
         if ("true".equalsIgnoreCase(string)) {
-            return Boolean.TRUE;
+            return string;
         }
         if ("false".equalsIgnoreCase(string)) {
-            return Boolean.FALSE;
+            return string;
         }
         if ("null".equalsIgnoreCase(string)) {
-            return JSONObject.NULL;
+            return string;
         }
 
 // If it might be a number, try converting it, first as a Long, and then as a

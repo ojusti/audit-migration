@@ -20,7 +20,7 @@ import fr.infologic.vei.audit.gateway.AuditGateway;
 import fr.infologic.vei.audit.mongo.json.MongoJson;
 
 
-public class AuditMongoDataSinkTest implements AuditGateway
+public class AuditMongoDataSinkTest extends AuditGatewayStub
 {
     private List<AuditContent> content;
     private long sequence;
@@ -65,9 +65,16 @@ public class AuditMongoDataSinkTest implements AuditGateway
         trace.version = patches.size();
     }
 
-    private AuditContent entry(String xml)
+    private AuditContent entry(final String xml)
     {
-        AuditContent entry = new AuditContent();
+        AuditContent entry = new AuditContent()
+        {
+            @Override
+            String xml()
+            {
+                return xml == null ? "<object/>" : document(xml);
+            }
+        };
         entry.setMetadataId("type");
         entry.setSourceDosResIK(1L);
         entry.setSourceEK("key");
@@ -85,7 +92,6 @@ public class AuditMongoDataSinkTest implements AuditGateway
         else
         {
             entry.setTyp(1);
-            entry.xml = document(xml);            
         }
         return entry;
     }
@@ -101,10 +107,5 @@ public class AuditMongoDataSinkTest implements AuditGateway
         Assertions.assertThat(patch).isEqualToComparingFieldByField(patches.get(patch.version - 1));
         patches.set(patch.version - 1, null);
     }
-
-    @Override public void trace(AuditTrace trace) { fail("Should not be called"); }
-    @Override public TrailFind find(TrailKey key) { fail("Should not be called"); return null; }
-    @Override public TraceQueryDispatch makeQuery() { fail("Should not be called"); return null; }
-    @Override public AdminDB db() { fail("Should not be called"); return null; }
 
 }
