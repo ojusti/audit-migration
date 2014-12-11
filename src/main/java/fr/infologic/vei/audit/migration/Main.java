@@ -57,9 +57,9 @@ public class Main
             oracleDBPassword = args.length == 3 ? args[2] : args[3];
             System.out.println(String.format("number of threads = %d", numberOfThreads));
             System.out.println(String.format("Oracle DB URL = %s", oracleDBURL));
-            System.out.println(String.format("Oracle DB user = %d", dBUser));
-            System.out.println(String.format("Oracle DB password = %d", oracleDBPassword));
-            System.out.println(String.format("Mongo DB user on localhost default Mongo port = %d", dBUser));
+            System.out.println(String.format("Oracle DB user = %s", dBUser));
+            System.out.println(String.format("Oracle DB password = %s", oracleDBPassword));
+            System.out.println(String.format("Mongo DB user on localhost default Mongo port = %s", dBUser));
         }
         catch(Throwable e)
         {

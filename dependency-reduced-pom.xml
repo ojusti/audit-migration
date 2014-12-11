@@ -4,7 +4,7 @@
   <groupId>fr.infologic.vei</groupId>
   <artifactId>audit-migration</artifactId>
   <name>Audit Data Migration</name>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0</version>
   <build>
     <plugins>
       <plugin>
