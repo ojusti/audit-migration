@@ -36,8 +36,9 @@ public class Main
     {
         executor.shutdown();
         executor.awaitTermination(1, TimeUnit.HOURS);
-        System.out.println(oracle.mesure);
-        System.out.println(mongo.mesure);
+        System.err.println(oracle.mesure);
+        System.err.println(mongo.mesure);
+        System.err.println(MigrateKeyTask.mesure);
         int recordsInOracle = oracle.count();
         int recordsInMongo = mongo.count();
         if(recordsInMongo != recordsInOracle)
@@ -55,11 +56,11 @@ public class Main
             oracleDBURL = args[1];
             dBUser = args[2];
             oracleDBPassword = args.length == 3 ? args[2] : args[3];
-            System.out.println(String.format("number of threads = %d", numberOfThreads));
-            System.out.println(String.format("Oracle DB URL = %s", oracleDBURL));
-            System.out.println(String.format("Oracle DB user = %s", dBUser));
-            System.out.println(String.format("Oracle DB password = %s", oracleDBPassword));
-            System.out.println(String.format("Mongo DB user on localhost default Mongo port = %s", dBUser));
+            System.err.println(String.format("number of threads = %d", numberOfThreads));
+            System.err.println(String.format("Oracle DB URL = %s", oracleDBURL));
+            System.err.println(String.format("Oracle DB user = %s", dBUser));
+            System.err.println(String.format("Oracle DB password = %s", oracleDBPassword));
+            System.err.println(String.format("Mongo DB user on localhost default Mongo port = %s", dBUser));
         }
         catch(Throwable e)
         {

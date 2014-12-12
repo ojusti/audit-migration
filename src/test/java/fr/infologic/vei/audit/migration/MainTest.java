@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import fr.infologic.vei.audit.api.AuditIngestTrace;
 
-@Ignore 
+@Ignore
 public class MainTest extends AuditGatewayStub
 {
     private static final String URL = "jdbc:oracle:thin:@10.99.81.6:1521:orcl";
@@ -22,6 +22,12 @@ public class MainTest extends AuditGatewayStub
     public void ingestAll() throws SQLException, InterruptedException, IOException
     {
         Main.main("8", URL, USER, PASSWORD);
+    }
+    
+    @Test
+    public void ingestNightlyBuild() throws SQLException, InterruptedException, IOException
+    {
+        Main.main("8", "jdbc:oracle:thin:@10.99.81.19:1521:orclweiso", "MI_VALENTIN_HEAD");
     }
     
     @Ignore @Test
@@ -35,7 +41,7 @@ public class MainTest extends AuditGatewayStub
         key.setMetadataId("fr.infologic.gpao.modele.Planning");
         key.setSourceDosResIK(2L);
         key.setSourceEK("SEM");
-        new AuditMongoDataSink(this).ingest(new AuditOracleDataSource(db, Collections.emptySet()).fetch(key));
+        new AuditMongoDataSink(this).ingest(key, new AuditOracleDataSource(db, Collections.emptySet()).fetch(key));
     }
 
     @Override

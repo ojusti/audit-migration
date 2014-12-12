@@ -7,6 +7,6 @@ interface AuditDataSink
     int count();
     int count(AuditKey key);
     void delete(AuditKey key);
-    void ingest(List<AuditContent> content);
+    void ingest(AuditKey key, List<AuditContent> trail);
 
 }

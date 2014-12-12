@@ -58,7 +58,7 @@ class AuditMongoDataSink implements AuditDataSink
     }
 
     @Override
-    public void ingest(List<AuditContent> trail)
+    public void ingest(AuditKey key, List<AuditContent> trail)
     {
         mesure.arm();
         try
@@ -75,10 +75,16 @@ class AuditMongoDataSink implements AuditDataSink
                 gateway.ingest(patch);
                 base = content;
             }
+            mesure.count(1, trail.size());
+        }
+        catch(Throwable t)
+        {
+            gateway.find(key).delete();
+            mesure.count(0);
+            throw new MigrationAuditException(key, trail, t);
         }
         finally
         {
-            mesure.count(1, trail.size());
             mesure.printIf(IS_10000);
         }
     }

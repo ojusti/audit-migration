@@ -1,5 +1,7 @@
 package fr.infologic.vei.audit.migration;
 
+import java.util.List;
+
 
 public class MigrationAuditException extends RuntimeException
 {
@@ -8,9 +10,9 @@ public class MigrationAuditException extends RuntimeException
         super(e);
     }
 
-    public MigrationAuditException(AuditKey key, Throwable t)
+    MigrationAuditException(AuditKey key, List<AuditContent> failure, Throwable t)
     {
-        super(key.toString(), t);
+        super(key + ": " + failure, t);
     }
 
 }

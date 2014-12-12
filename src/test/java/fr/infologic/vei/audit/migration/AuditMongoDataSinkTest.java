@@ -23,7 +23,7 @@ public class AuditMongoDataSinkTest extends AuditGatewayStub
     @Test
     public void testIngest()
     {
-        new AuditMongoDataSink(this).ingest(content);
+        new AuditMongoDataSink(this).ingest(content.get(0), content);
         assertAllPatchesWereIngested();
     }
 

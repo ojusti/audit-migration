@@ -52,7 +52,7 @@ public class Mesure
                 message.append(", ");
             }
             long counter = counters[i].get();
-            message.append(String.format("%s[%d, %f/s, %f/s]", dimensions[i], counter, ((double) counter) * 1000 / elapsed, ((double) counter) * 1000 / real));
+            message.append(String.format("%s[%d, %.2f/s, %.2f/s]", dimensions[i], counter, ((double) counter) * 1000 / elapsed, ((double) counter) * 1000 / real));
         }
         return message.toString();
     }
@@ -63,5 +63,10 @@ public class Mesure
         {
             System.out.println(toString());
         }
+    }
+    
+    public static void main(String[] args)
+    {
+        System.out.println(String.format("%.2f", 1.234));
     }
 }

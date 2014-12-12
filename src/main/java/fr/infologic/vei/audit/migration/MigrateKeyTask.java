@@ -4,11 +4,10 @@ import static fr.infologic.vei.audit.migration.Mesure.IS_10000;
 
 class MigrateKeyTask implements Runnable
 {
-
     private final AuditKey key;
     private final AuditDataSource source;
     private final AuditDataSink sink;
-    private static Mesure mesure = new Mesure("Migrate", "keys", "imported", "deleted");
+    static Mesure mesure = new Mesure("Migrate", "keys", "present", "errors");
 
     MigrateKeyTask(AuditKey key, AuditDataSource source, AuditDataSink sink)
     {
@@ -20,8 +19,8 @@ class MigrateKeyTask implements Runnable
     @Override
     public void run()
     {
-        boolean fastExit = false;
-        boolean deleted = false;
+        boolean exist = false;
+        boolean error = false;
         mesure.arm();
         try
         {
@@ -30,31 +29,32 @@ class MigrateKeyTask implements Runnable
             {
                 if(source.count(key) == imported)
                 {
-                    fastExit = true;
+                    exist = true;
                     return;
                 }
-                deleted = true;
                 sink.delete(key);
             }
-            importAll();
+            error = !importAll();
         }
         finally
         {
-            mesure.count(1, fastExit ? 0 : 1, deleted ? 1 : 0);
+            mesure.count(1, exist ? 1 : 0, error ? 1 : 0);
             mesure.printIf(IS_10000);
         }
     }
 
-    private void importAll()
+    private boolean importAll()
     {
         try
         {
-            sink.ingest(source.fetch(key));
+            sink.ingest(key, source.fetch(key));
+            return true;
         }
         catch(Throwable t)
         {
-            System.out.println(source.fetch(key));
-            throw new MigrationAuditException(key, t);
+            System.err.println(String.format("Failed to migrate %s", key));
+            t.printStackTrace(System.err);
+            return false;
         }
     }
 
