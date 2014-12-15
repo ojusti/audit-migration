@@ -326,39 +326,25 @@ public class XML {
 
 // If it might be a number, try converting it, first as a Long, and then as a
 // Double. If that doesn't work, return the string.
-
-        try {
-            char initial = string.charAt(0);
-            if (initial == '-' || (initial >= '0' && initial <= '9')) {
-                Long value = new Long(string);
-                if (value.toString().equals(string)) 
-                {
-                    if (value <= Integer.MAX_VALUE && value >= Integer.MIN_VALUE)
-                    {
-                        return value.intValue();
-                    }
-                    return value;
-                }
-            }
-        }  catch (Exception stringIsNotALong) {
+        try
+        {
             try {
-                Double value = new Double(string);
-                if (value.toString().equals(string)) {
-                    return value;
-                }
-            }  catch (Exception stringIsNotADouble) {
-                try
+                Number number = DecimalFormatThreadLocal.parse(string);
+                if(number != null)
                 {
-                    return SimpleDateFormatThreadLocal.parse(string);
+                    return number;
                 }
-                catch (ParseException stringIsNotADate)
-                {
-                }
+            }  
+            catch (Exception stringIsNotANumber) 
+            {
             }
+            return SimpleDateFormatThreadLocal.parse(string);
+        }
+        catch (ParseException stringIsNotADate)
+        {
         }
         return string;
     }
-    
 
 
     /**

@@ -10,7 +10,6 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import fr.infologic.vei.audit.api.AuditIngestTrace;
-
 @Ignore
 public class MainTest extends AuditGatewayStub
 {
@@ -25,9 +24,17 @@ public class MainTest extends AuditGatewayStub
     }
     
     @Test
-    public void ingestNightlyBuild() throws SQLException, InterruptedException, IOException
+    public void ingestNightlyBuild() throws SQLException
     {
-        Main.main("8", "jdbc:oracle:thin:@10.99.81.19:1521:orclweiso", "MI_VALENTIN_HEAD");
+        OracleDataSource db = new OracleDataSource();
+        db.setURL("jdbc:oracle:thin:@10.99.81.19:1521:orclweiso");
+        db.setUser("MI_VALENTIN_HEAD");
+        db.setPassword("MI_VALENTIN_HEAD");
+        AuditKey key = new AuditKey();
+        key.setMetadataId("fr.infologic.stocks.cumuls.modele.Prevision");
+        key.setSourceDosResIK(1L);
+        key.setSourceEK("02J");
+        new AuditMongoDataSink("MI_VALENTIN_HEAD").ingest(key, new AuditOracleDataSource(db, Collections.emptySet()).fetch(key));
     }
     
     @Ignore @Test
@@ -48,5 +55,12 @@ public class MainTest extends AuditGatewayStub
     public void ingest(AuditIngestTrace patch)
     {
         
+    }
+    
+    @Test
+    public void testParse()
+    {
+        double x = new Double("36.000000");
+        System.out.println(x);
     }
 }

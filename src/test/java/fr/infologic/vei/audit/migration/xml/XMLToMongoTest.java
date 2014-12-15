@@ -31,9 +31,16 @@ public class XMLToMongoTest
     }
     
     @Test
+    public void transformLong()
+    {
+        BasicBSONObject result = transform("<number>24 123 456</number>");
+        assertThat(result).containsExactly(e("number", 24123456));
+    }
+    
+    @Test
     public void transformReal()
     {
-        BasicBSONObject result = transform("<number>123.2</number>");
+        BasicBSONObject result = transform("<number>123.200000</number>");
         assertThat(result).containsExactly(e("number", 123.2));
     }
     
@@ -150,7 +157,7 @@ public class XMLToMongoTest
     {
         BasicBSONObject result = transform("<string>NEGOCE</string>"
                                          + "<decimal>123</decimal>"
-                                         + "<number>123.2</number>"
+                                         + "<number>123.200000</number>"
                                          + "<date>26/09/14</date>"
                                          + "<timestamp>03/12/14 15:32</timestamp>"
                                          + "<reference><code>a code</code></reference>"
@@ -189,7 +196,7 @@ public class XMLToMongoTest
         return "<?xml version=\"1.0\" encoding=\"UTF-8\" ?><object class=\"fr.infologic.stocks.fichierbase.modele.Produit\">" + content + "</object>";
     }
     
-    private static MapEntry e(String key, Object value)
+    static MapEntry e(String key, Object value)
     {
         return MapEntry.entry(key, value);
     }

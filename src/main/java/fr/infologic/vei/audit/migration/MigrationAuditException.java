@@ -12,7 +12,7 @@ public class MigrationAuditException extends RuntimeException
 
     MigrationAuditException(AuditKey key, List<AuditContent> failure, Throwable t)
     {
-        super(key + ": " + failure, t);
+        super(String.format("%s: %d records / first is %s", key, failure.size(), failure.get(0)), t);
     }
 
 }

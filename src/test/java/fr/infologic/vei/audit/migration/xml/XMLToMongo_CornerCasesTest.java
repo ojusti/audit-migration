@@ -1,6 +1,7 @@
 package fr.infologic.vei.audit.migration.xml;
 
 import static fr.infologic.vei.audit.migration.xml.DBObjectAssert.assertThat;
+import static fr.infologic.vei.audit.migration.xml.XMLToMongoTest.e;
 
 import org.bson.BasicBSONObject;
 import org.junit.Test;
@@ -16,6 +17,13 @@ public class XMLToMongo_CornerCasesTest
         BasicBSONObject result = XMLToMongoTest.transform(xml);
         
         assertThat(result).scalar("contenuRegleDecodage").isEqualTo("(?s)(.*)").isInstanceOf(String.class);
+    }
+    
+    @Test
+    public void transformReal()
+    {
+        BasicBSONObject result = XMLToMongoTest.transform("<number>123.200000</number>");
+        assertThat(result).containsExactly(e("number", 123.2));
     }
     
     @Test
