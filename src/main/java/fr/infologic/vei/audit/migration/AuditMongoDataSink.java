@@ -1,7 +1,5 @@
 package fr.infologic.vei.audit.migration;
 
-import static fr.infologic.vei.audit.migration.Mesure.IS_10000;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -57,6 +55,7 @@ class AuditMongoDataSink implements AuditDataSink
         gateway.find(key).delete();
     }
 
+    
     @Override
     public void ingest(AuditKey key, List<AuditContent> trail)
     {
@@ -85,7 +84,7 @@ class AuditMongoDataSink implements AuditDataSink
         }
         finally
         {
-            mesure.printIf(IS_10000);
+            mesure.printIf(Is_100_000.TESTER);
         }
     }
     Mesure mesure = new Mesure("Mongo ingest", "keys", "docs");

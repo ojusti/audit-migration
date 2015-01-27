@@ -44,6 +44,11 @@
 			<artifactId>commons-dbutils</artifactId>
 			<version>1.6</version>
 		</dependency>
+		<dependency>
+            <groupId>fr.infologic.vei</groupId>
+            <artifactId>measure</artifactId>
+            <version>1.0.0</version>
+        </dependency>
 	</dependencies>
 	<build>
 		<plugins>

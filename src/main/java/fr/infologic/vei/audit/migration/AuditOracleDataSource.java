@@ -1,7 +1,5 @@
 package fr.infologic.vei.audit.migration;
 
-import static fr.infologic.vei.audit.migration.Mesure.IS_10000;
-
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -148,7 +146,7 @@ class AuditOracleDataSource implements AuditKeyProducer, AuditDataSource
         finally
         {
             mesure.count(1, result == null ? 0 : result.size());
-            mesure.printIf(IS_10000);
+            mesure.printIf(Is_100_000.TESTER);
         }
     }
 

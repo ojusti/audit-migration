@@ -1,6 +1,5 @@
 package fr.infologic.vei.audit.migration;
 
-import static fr.infologic.vei.audit.migration.Mesure.IS_10000;
 
 class MigrateKeyTask implements Runnable
 {
@@ -39,7 +38,7 @@ class MigrateKeyTask implements Runnable
         finally
         {
             mesure.count(1, exist ? 1 : 0, error ? 1 : 0);
-            mesure.printIf(IS_10000);
+            mesure.printIf(Is_100_000.TESTER);
         }
     }
 
